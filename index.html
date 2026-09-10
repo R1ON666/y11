@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Компьютерная Техника</title>
+  <script src="https://api-maps.yandex.ru/2.1/?apikey=ваш_api_ключ&lang=ru_RU"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 12px;
+    }
+    .app {
+      max-width: 340px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .header {
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 8px;
+      text-align: center;
+    }
+    .logo-text {
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      fill: url(#flow-gradient);
+    }
+    .section {
+      background: #1e293b;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px dashed #334155;
+    }
+    h3 {
+      margin: 0 0 12px 0;
+      color: #38bdf8;
+      font-size: 16px;
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      color: #94a3b8;
+      margin-bottom: 4px;
+    }
+    select {
+      width: 100%;
+      padding: 10px;
+      background: #0f172a;
+      color: #fff;
+      border: 1px solid #475569;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      box-sizing: border-box;
+      font-size: 13px;
+    }
+    .info-box {
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      margin-top: 10px;
+      background: #334155;
+      white-space: pre-line;
+    }
+    .status-ok {
+      border-left: 4px solid #10b981;
+      color: #34d399;
+    }
+    .status-error {
+      border-left: 4px solid #ef4444;
+      color: #f87171;
+    }
+    .price-tag {
+      font-size: 16px;
+      font-weight: bold;
+      margin-top: 12px;
+      text-align: right;
+      color: #38bdf8;
+    }
+    .hint {
+      font-size: 11px;
+      color: #94a3b8;
+      margin: -6px 0 10px 0;
+    }
+    .map-container {
+      width: 100%;
+      height: 180px;
+      background: #111827;
+      border-radius: 8px;
+      position: relative;
+      border: 1px solid #475569;
+      overflow: hidden;
+    }
+    #yandex-map {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <svg viewBox="0 0 300 50" class="logo-svg">
+        <defs>
+          <linearGradient id="flow-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#00f2fe">
+              <animate attributeName="offset" values="0; 1; 0" dur="4s" repeatCount="indefinite" />
+            </stop>
+            <stop offset="50%" stop-color="#4facfe">
+              <animate attributeName="offset" values="0.5; 1.5; 0.5" dur="4s" repeatCount="indefinite" />
+            </stop>
+            <stop offset="100%" stop-color="#00f2fe">
+              <animate attributeName="offset" values="1; 2; 1" dur="4s" repeatCount="indefinite" />
+            </stop>
+          </linearGradient>
+        </defs>
+        <text x="50%" y="35" text-anchor="middle" class="logo-text">TECHNO-SHOP</text>
+      </svg>
+    </header>
+
+    <section class="section">
+      <h3>Конфигуратор ПК</h3>
+      
+      <label>Процессор (CPU):</label>
+      <select id="cpu-select">
+        <option value="">-- Выберите CPU --</option>
+        <option value="i5-12400">Intel i5-12400 (LGA1700) - 12000₽</option>
+        <option value="r5-5600X">AMD Ryzen 5 5600X (AM4) - 13000₽</option>
+        <option value="i9-13900K">Intel i9-13900K (LGA1700) - 45000₽</option>
+      </select>
+
+      <label>Материнская плата:</label>
+      <select id="mb-select">
+        <option value="">-- Выберите плату --</option>
+        <option value="b660">ASUS B660 (LGA1700) - 10000₽</option>
+        <option value="b550">GIGABYTE B550 (AM4) - 9500₽</option>
+        <option value="z790">MSI Z790 (LGA1700) - 22000₽</option>
+      </select>
+
+      <label>Видеокарта (GPU):</label>
+      <select id="gpu-select">
+        <option value="">-- Выберите GPU --</option>
+        <option value="rtx3060">RTX 3060 (170W) - 30000₽</option>
+        <option value="rtx4070">RTX 4070 (200W) - 65000₽</option>
+      </select>
+
+      <label>Блок питания (БП):</label>
+      <select id="psu-select">
+        <option value="">-- Выберите БП --</option>
+        <option value="500w">БП 500W - 4000₽</option>
+        <option value="750w">БП 750W - 8000₽</option>
+      </select>
+
+      <div id="compat-info" class="info-box status-ok">Система пуста</div>
+      
+      <div class="price-tag">
+        Цена: <span id="pc-price">0</span> ₽
+      </div>
+    </section>
+
+    <section class="section">
+      <h3>Точки выдачи и доставка</h3>
+      <p class="hint">Нажмите на метку на карте:</p>
+      <div class="map-container">
+        <div id="yandex-map"></div>
+      </div>
+      <div id="delivery-info" class="info-box">Точка не выбрана</div>
+    </section>
+  </div>
+
+  <script>
+    const db = {
+      cpu: {
+        "i5-12400": { price: 12000, socket: "LGA1700", tdp: 65 },
+        "r5-5600X": { price: 13000, socket: "AM4", tdp: 65 },
+        "i9-13900K": { price: 45000, socket: "LGA1700", tdp: 125 }
+      },
+      mb: {
+        "b660": { price: 10000, socket: "LGA1700" },
+        "b550": { price: 9500, socket: "AM4" },
+        "z790": { price: 22000, socket: "LGA1700" }
+      },
+      gpu: {
+        "rtx3060": { price: 30000, tdp: 170 },
+        "rtx4070": { price: 65000, tdp: 200 }
+      },
+      psu: {
+        "500w": { price: 4000, power: 500 },
+        "750w": { price: 8000, power: 750 }
+      }
+    };
+
+    const cpuSelect = document.getElementById('cpu-select');
+    const mbSelect = document.getElementById('mb-select');
+    const gpuSelect = document.getElementById('gpu-select');
+    const psuSelect = document.getElementById('psu-select');
+    const compatInfo = document.getElementById('compat-info');
+    const pcPriceEl = document.getElementById('pc-price');
+    const deliveryInfo = document.getElementById('delivery-info');
+
+    function checkCompatibility() {
+      const cpu = db.cpu[cpuSelect.value];
+      const mb = db.mb[mbSelect.value];
+      const gpu = db.gpu[gpuSelect.value];
+      const psu = db.psu[psuSelect.value];
+
+      let totalPrice = 0;
+      let errors = [];
+
+      if (cpu) totalPrice += cpu.price;
+      if (mb) totalPrice += mb.price;
+      if (gpu) totalPrice += gpu.price;
+      if (psu) totalPrice += psu.price;
+
+      if (cpu && mb && cpu.socket !== mb.socket) {
+        errors.push(`Ошибка сокета! CPU: ${cpu.socket}, Плата: ${mb.socket}`);
+      }
+
+      if (psu) {
+        let requiredPower = 150;
+        if (cpu) requiredPower += cpu.tdp;
+        if (gpu) requiredPower += gpu.tdp;
+        let recPower = Math.ceil(requiredPower * 1.2);
+
+        if (psu.power < recPower) {
+          errors.push(`Слабый БП! Надо: ${recPower}W, Выбрано: ${psu.power}W`);
+        }
+      }
+
+      if (errors.length > 0) {
+        compatInfo.className = "info-box status-error";
+        compatInfo.innerText = errors.join("\n");
+      } else if (cpu || mb || gpu || psu) {
+        compatInfo.className = "info-box status-ok";
+        compatInfo.innerText = "Компоненты совместимы!";
+      } else {
+        compatInfo.className = "info-box status-ok";
+        compatInfo.innerText = "Система пуста";
+      }
+
+      pcPriceEl.innerText = totalPrice;
+    }
+
+    [cpuSelect, mbSelect, gpuSelect, psuSelect].forEach(select => {
+      select.addEventListener('change', checkCompatibility);
+    });
+
+    checkCompatibility();
+
+    let currentPlacemark = null;
+
+    const points = [
+      { name: "Центральный склад (ул. Ленина, 1)", cost: 0, coords: [55.7558, 37.6176] },
+      { name: "Магазин 'Север' (ТЦ Космос)", cost: 250, coords: [55.7958, 37.5472] },
+      { name: "Пункт выдачи 'Юг' (ул. Новая, 45)", cost: 450, coords: [55.6714, 37.6080] }
+    ];
+
+    ymaps.ready(function() {
+      const map = new ymaps.Map("yandex-map", {
+        center: [55.751574, 37.573856],
+        zoom: 11,
+        controls: []
+      });
+
+      points.forEach(point => {
+        const placemark = new ymaps.Placemark(point.coords, {
+          hintContent: point.name,
+          balloonContent: point.name
+        }, {
+          preset: 'islands#circleIcon',
+          iconColor: point.cost === 0 ? '#10b981' : '#f97316'
+        });
+
+        placemark.events.add('click', function() {
+          if (currentPlacemark) {
+            currentPlacemark.options.set('iconColor', currentPlacemark._originalColor);
+          }
+          currentPlacemark = placemark;
+          currentPlacemark._originalColor = point.cost === 0 ? '#10b981' : '#f97316';
+          placemark.options.set('iconColor', '#ef4444');
+
+          if (point.cost === 0) {
+            deliveryInfo.innerHTML = `<strong>${point.name}</strong><br>Способ: Самовывоз<br>Стоимость: 0 ₽`;
+          } else {
+            deliveryInfo.innerHTML = `<strong>${point.name}</strong><br>Способ: Доставка курьером<br>Стоимость: ${point.cost} ₽`;
+          }
+        });
+
+        map.geoObjects.add(placemark);
+      });
+    });
+  </script>
+</body>
+</html>
